@@ -75,13 +75,13 @@
 </template>
 
 <script>
+import {firebase} from '../firebase'
 export default{
     data(){
         return{
             id:'',
             name:'',
             phone:'',
-            customers:[],
             show:false,
             store:{},
             editing:false
@@ -89,11 +89,12 @@ export default{
     },
     methods:{
         add(){
-            this.customers.push({
+            const customer={
                 id:this.id,
                 name:this.name,
-                phone:this.phone    
-            })
+                phone:this.phone
+            }
+            firebase.database().ref('customers').push(customer)
             this.close()
         },
         close(){
@@ -104,8 +105,10 @@ export default{
             this.editing=false
         },
         deleteLi(customer){
-            let index=this.customers.indexOf(customer)
-            this.customers.splice(index,1)
+            firebase.database().ref(`customers/${customer.iid}`).remove()
+            .then(()=>{
+                console.log('employee deleted')
+            })
         },
         editcu(customer){
             this.id=customer.id
@@ -116,11 +119,25 @@ export default{
             this.store=customer
         },
         updatecu(){
-            let targetobj=this.customers.find(obj =>obj.id=this.store.id)
-            targetobj.id=this.id
-            targetobj.name=this.name
-            targetobj.phone=this.phone
+           const customer={
+                id:this.id,
+                name:this.name,
+                phone:this.phone
+           }
+           firebase.database().ref('customers/'+this.store.iid).update(customer)
+           .then(()=>{
+            console.log('employee update')
             this.close()
+           })
+           .catch((error)=>{
+            console.log(error.message)
+            this.close()
+           })
+        }
+    },
+    computed:{
+        customers(){
+            return this.$store.getters.customerDetails
         }
     }
 }
