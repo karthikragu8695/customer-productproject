@@ -6,11 +6,15 @@
                         <th>Customer Id</th>
                         <th>Customer Name</th>
                         <th>Customer Phone</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                     <tr v-for="customer in customers" :key="customer.id">
                         <td>{{ customer.id }}</td>
                         <td>{{ customer.name }}</td>
                         <td>{{ customer.phone }}</td>
+                        <td ><v-btn @click="editcu(customer)">edit</v-btn></td>
+                        <td ><v-btn @click="deleteLi(customer)">delete</v-btn></td>
                     </tr>
                     </thead>
                 </v-table>
@@ -52,13 +56,15 @@
                 </v-container>
 
     <v-divider></v-divider>
-
     <v-card-actions>
       <v-spacer></v-spacer>
         <v-btn color="red" @click="close">close</v-btn>
-      <v-btn color="success" @click="add">
+      <v-btn v-if="!editing" else color="success" @click="add">
         Complete Registration
-
+        <v-icon icon="mdi-chevron-right" end></v-icon>
+        </v-btn>
+      <v-btn v-else color="success" @click="updatecu">
+        update
         <v-icon icon="mdi-chevron-right" end></v-icon>
       </v-btn>
     </v-card-actions>
@@ -76,7 +82,9 @@ export default{
             name:'',
             phone:'',
             customers:[],
-            show:false
+            show:false,
+            store:{},
+            editing:false
         }
     },
     methods:{
@@ -90,6 +98,29 @@ export default{
         },
         close(){
             this.show=false
+            this.id=null
+            this.name=null
+            this.phone=null
+            this.editing=false
+        },
+        deleteLi(customer){
+            let index=this.customers.indexOf(customer)
+            this.customers.splice(index,1)
+        },
+        editcu(customer){
+            this.id=customer.id
+            this.name=customer.name
+            this.phone=customer.phone
+            this.show=true
+            this.editing=true
+            this.store=customer
+        },
+        updatecu(){
+            let targetobj=this.customers.find(obj =>obj.id=this.store.id)
+            targetobj.id=this.id
+            targetobj.name=this.name
+            targetobj.phone=this.phone
+            this.close()
         }
     }
 }
