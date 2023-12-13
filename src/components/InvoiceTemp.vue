@@ -49,12 +49,29 @@
                       v-model="customer"
                       variant="outlined">
                 </v-autocomplete>
-                <v-autocomplete
-                      class="ml-5"
-                      placeholder="2021-12-09"
-                      label="Invoice Date"
-                      variant="outlined">
-                </v-autocomplete>
+                <!-------------------Date Picker------------------------->
+                <v-col cols="3">
+                                    <v-menu
+                                        @click="dmenu=true"
+                                        :close-on-content-click="false"
+                                        :nudge-right="40"
+                                        transition="scale-transition"
+                                        offset-y
+                                        min-width="290px"
+                                    >
+                                        <template v-slot:activator="{ on }">
+                                        <v-text-field 
+                                        outlined
+                                        v-model="idate"
+                                        label="Invoice date"
+                                        v-on="on"
+                                        
+                                        readonly
+                                        ></v-text-field>
+                                        </template>
+                                        <v-date-picker v-if="dmenu" v-model="idate"></v-date-picker>
+                                    </v-menu>
+                                </v-col>
               </v-text>
               <v-text class="d-flex w-[1000px]  mt-10">
                 <v-autocomplete 
@@ -84,9 +101,16 @@
                       item-value="iid"
                       item-title="price"
                       v-model="product"
-                      label="Date"
+                      label="price"
                       variant="outlined">
                 </v-autocomplete>
+                <v-text-field
+                      class="ml-5"
+                      placeholder="Quantity"
+                      v-model="qt"
+                      label="Quantity"
+                      variant="outlined">
+                </v-text-field>
               </v-text>
             </v-table>
 
@@ -95,16 +119,27 @@
               <tr>
                 <th>product Name</th>
                 <th>product Id</th>
+                <th> Quantity </th>
                 <th>product price</th>
                 <th>Amount</th>
-                <th>Actions </th>
+                
               </tr>
               <tr>
-                <td>oil</td>
-                <td>1</td>
-                <td>1200</td>
-                <td>1220</td>
-                <td></td>
+                <td>
+                  <v-autocomplete v-model="product" item-value="iid" readonly item-title="name" :items="products"></v-autocomplete>
+                </td>
+                <td>
+                  <v-autocomplete v-model="product" item-value="iid" readonly item-title="id" :items="products"></v-autocomplete>
+                </td>
+                <td>
+                  <v-autocomplete v-model="qt" ></v-autocomplete>
+                </td>
+                <td>
+                  <v-autocomplete v-model="product" item-value="iid" readonly item-title="price" :items="products"></v-autocomplete>
+                </td>
+                <td>
+                 <v-card></v-card>
+                </td>
               </tr>
               <tr>
                 <td></td>
@@ -128,12 +163,19 @@
 export default{
   data(){
     return{
+      name:'',
+      price:'',
       dialog:false,
       show:false,
       showitem:false,
       editing:false,
       customer:null,
-      product:null
+      product:null,
+      dmenu:false,
+      idate:null,
+      qt:1,
+      
+      
     }
   },
   methods:{
@@ -141,6 +183,7 @@ export default{
       this.showitem=false
       this.show=false
     }, 
+    
     },
     computed:{
       customers(){
@@ -148,7 +191,9 @@ export default{
       },
       products(){
         return this.$store.getters.productDetails
-      }
+      },
+      
+      
     }
   }
 </script>

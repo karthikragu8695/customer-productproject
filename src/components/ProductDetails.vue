@@ -6,6 +6,7 @@
                         <th>product Id</th>
                         <th>product Name</th>
                         <th>product Price</th>
+                        <th>product Quantity</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -13,6 +14,7 @@
                         <td>{{ product.id }}</td>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
+                        <td>{{ product.Quantity }}</td>
                         <td ><v-btn @click="editcu(product)">edit</v-btn></td>
                         <td ><v-btn @click="deleteLi(product)">delete</v-btn></td>
                     </tr>
@@ -40,6 +42,12 @@
                         label="Product name"
                         variant="underlined">
                     </v-text-field>
+                    <v-text-field
+                        v-model="Quantity"
+                        color="primary"
+                        label="Product Quantity"
+                        variant="underlined">
+                    </v-text-field>
 
                     <v-text-field
                         v-model="price"
@@ -47,6 +55,7 @@
                         label="Product Price"
                         variant="underlined">
                     </v-text-field>
+                    
                 </v-container>
 
     <v-divider></v-divider>
@@ -76,6 +85,7 @@ export default{
             id:'',
             name:'',
             price:'',
+            Quantity:'',
             show:false,
             store:{},
             editing:false
@@ -86,7 +96,8 @@ export default{
             const product={
                 id:this.id,
                 name:this.name,
-                price:this.price
+                price:this.price,
+               Quantity:this.Quantity
             }
             firebase.database().ref('products').push(product)
             this.close()
@@ -96,6 +107,7 @@ export default{
             this.id=null
             this.name=null
             this.price=null
+            this.Quantity=null
             this.editing=false
         },
         deleteLi(product){
@@ -108,6 +120,7 @@ export default{
             this.id=product.id
             this.name=product.name
             this.price=product.price
+            this.Quantity=product.Quantity
             this.show=true
             this.editing=true
             this.store=product
@@ -116,7 +129,8 @@ export default{
            const product={
                 id:this.id,
                 name:this.name,
-                price:this.product
+                price:this.product,
+                Quantity:this.Quantity
            }
            firebase.database().ref('products/'+this.store.iid).update(product)
            .then(()=>{
