@@ -132,7 +132,7 @@
                   <v-autocomplete v-model="product" item-value="iid" readonly item-title="id" :items="products"></v-autocomplete>
                 </td>
                 <td>
-                  <v-autocomplete v-model="qt" ></v-autocomplete>
+                  <v-autocomplete v-model="product" item-value="iid" item-title="Quantity" ></v-autocomplete>
                 </td>
                 <td>
                   <v-autocomplete v-model="product" item-value="iid" readonly item-title="price" :items="products"></v-autocomplete>
@@ -147,7 +147,7 @@
                 <td></td>
                 <td></td>
                 <td>
-                  <v-text-field placeholder="0" label="Total Amount" readonly variant="outlined"> 
+                  <v-text-field placeholder="0" label="Total Amount" readonly variant="outlined">
                 </v-text-field>
                 </td>
               </tr>
@@ -174,6 +174,7 @@ export default{
       dmenu:false,
       idate:null,
       qt:1,
+      amg:null
       
       
     }
@@ -183,7 +184,12 @@ export default{
       this.showitem=false
       this.show=false
     }, 
-    
+    // amount(){
+    //     let amg=this.qt*+this.price
+    //     this.products.push(
+    //       {price:amg}
+    //     )
+    //   }
     },
     computed:{
       customers(){
@@ -192,8 +198,6 @@ export default{
       products(){
         return this.$store.getters.productDetails
       },
-      
-      
     }
   }
 </script>
