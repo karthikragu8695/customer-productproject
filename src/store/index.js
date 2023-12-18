@@ -12,7 +12,21 @@ export default createStore({
     },
     productDetails(state){
       return state.products
-    }
+    },
+    loadedCustomer(state){
+      return (customerId)=>{
+        return state.customers.find((customer)=>{
+          return customer.id=customerId
+        })
+      }
+    },
+    loadedProduct (state) {
+      return (productId) => {
+          return state.products.find((product) => {
+              return product.iid === productId
+          })
+      }
+  },
   },
   mutations: {
     CUSTOMER_DETAILS(state,payload){
@@ -52,7 +66,6 @@ export default createStore({
       })
     }
   },
-  
   modules: {
   }
 })
