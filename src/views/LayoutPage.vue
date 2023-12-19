@@ -21,8 +21,8 @@
       <v-divider></v-divider>
       <v-list-item link to="/" title="customer Details"></v-list-item>
       <v-list-item link to="/auth" title="Product Details"></v-list-item>
-      <v-list-item link to="/Invoice" title="Invoice"></v-list-item>
-      <v-list-item link to="/NewInvoice" title="product"></v-list-item>
+      <v-list-item link to="/Invoice" title=""></v-list-item>
+      <v-list-item link to="/NewInvoice" title="Invoice"></v-list-item>
     </v-navigation-drawer>
     <v-main>
       <router-view/>

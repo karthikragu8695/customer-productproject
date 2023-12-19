@@ -10,11 +10,12 @@
                     <v-col cols="2.5">Invoice Amount</v-col>
                     <v-col cols="2">Actions</v-col>
                 </v-row>
-                <v-row v-for="out in outside" :key="out.id">
-                    <v-col cols="">{{ out.no }}</v-col>
-                    <v-col cols="3">{{ out.name }}</v-col>
-                    <v-col cols="3">{{ out.amount }}</v-col>
-                    <v-col cols="3"></v-col>
+                <v-row v-for="invoice in invoices" :key="invoice.id">
+                    <v-col cols="2">{{ invoice.no }}</v-col>
+                    <v-col cols="2.5">{{ invoice.date }}</v-col>
+                    <v-col cols="3">{{ invoice.name }}</v-col>
+                    <v-col cols="2.5">{{ invoice.amount }}</v-col>
+                    <v-col cols="2"></v-col>
                 </v-row>
             </v-card-text>
         </v-card>
@@ -45,6 +46,7 @@
                         <v-autocomplete 
                             class="ml-10 mt-10"
                             label="Customer Id"
+                            @update:model-value="getName"
                             item-title="id"
                             :items="customers"
                             v-model="customer"
@@ -84,8 +86,8 @@
                         <v-col cols="2">{{ item.price }}</v-col>
                         <v-col cols="2">{{ item.amount }}</v-col>
                         <v-col cols="2">
-                             <v-btn @click="editInvoice(item)" >Ed</v-btn>
-                             <v-btn @click="deleteInvoice(item)" >De</v-btn>
+                             <v-btn @click="editInvoice(item)" icon small ><v-icon color="red">mdi-delete</v-icon></v-btn>
+                             <v-btn @click="deleteInvoice(item)" class="ml-5" icon small><v-icon color="red">mdi-pencil</v-icon> </v-btn>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -94,11 +96,11 @@
                 <v-col cols="4"></v-col>
                 <v-col cols="3">
                     <v-text-field
-                                    label="Total Amount"
-                                    v-model="tamount"
-                                    readonly
-                                    variant="outlined">
-                                </v-text-field>
+                        label="Total Amount"
+                        v-model="tamount"
+                        readonly
+                        variant="outlined">
+                    </v-text-field>
                 </v-col>
             </v-row>
                 </v-card-text>
@@ -162,12 +164,15 @@ export default{
         return{
             show:false,
             no:'',
+            date:null,
             splex:false,
             dmenu:false,
             tediting:false,
             outside:[],
             out:'',
-            customer:null,
+            customer:[
+                {sname:null}
+            ],
             product:null,
             name:'',
             id:'',
@@ -175,6 +180,7 @@ export default{
             quantity:1,
             items: [], 
             amount:null,
+            sname:null
         }
     },
     methods:{
@@ -187,6 +193,10 @@ export default{
             this.id = product.id
             this.name = product.name
         },
+        getName(v){
+            let customer = this.$store.getters.loadedCustomer(v)
+            this.sname = customer.name
+        },
         add(){
             this.items.push(
                 {
@@ -196,17 +206,16 @@ export default{
                    quantity:this.quantity,
                    amount:this.amountIn
                 }
-               
             )
             this.close()
         },
         paste(){
-            this.outside.push(
+            this.invoices.push(
                 {
                     no:this.no,
                     date:this.date,
-                    name:this.name,
-                    amount:this.amountIn,
+                    name:this.sname,
+                    amount:this.tamount,
 
                 }
             )
@@ -256,6 +265,9 @@ export default{
             amount = +amount + +items[i].amount
         }
         return amount
+      },
+      invoices(){
+        return this.$store.getters.loadedInvoices
       }
     }
 }

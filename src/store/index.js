@@ -4,7 +4,8 @@ import {firebase} from '../firebase'
 export default createStore({
   state: {
     customers:[],
-    products:[]
+    products:[],
+    Invoice:[]
   },
   getters: {
     customerDetails(state){
@@ -13,10 +14,13 @@ export default createStore({
     productDetails(state){
       return state.products
     },
+    loadedInvoices(state){
+      return state.Invoice
+    },
     loadedCustomer(state){
       return (customerId)=>{
         return state.customers.find((customer)=>{
-          return customer.id=customerId
+          return customer.id = customerId
         })
       }
     },
@@ -27,6 +31,13 @@ export default createStore({
           })
       }
   },
+    invoiceDetails(state){
+      return (invoiceId)=>{
+        return state.invoices.find((invoice) => {
+          return invoice.iid === invoiceId
+        })
+      }
+    }
   },
   mutations: {
     CUSTOMER_DETAILS(state,payload){
@@ -34,6 +45,8 @@ export default createStore({
     },
     PRODUCT_DETAILS(state,payload){
       state.products=payload
+    },INVOICE_DETAILS(state,payload){
+      state.Invoice=payload
     }
   },
   actions: {
@@ -63,6 +76,20 @@ export default createStore({
           })
         }
         commit('PRODUCT_DETAILS',products)
+      })
+    },
+    invoicedetails({commit}){
+      firebase.database().ref('invoices').on('value',(snapshot)=>
+      {
+        let invoices=[]
+        let data=snapshot.val()
+        for (let i in data){
+          invoices.push({
+            iid:i,
+            ...data[i]
+          })
+        }
+        commit('INVOICE_DETAILS',invoices)
       })
     }
   },
