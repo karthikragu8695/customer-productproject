@@ -15,7 +15,10 @@
                     <v-col cols="2.5">{{ invoice.date }}</v-col>
                     <v-col cols="3">{{ invoice.name }}</v-col>
                     <v-col cols="2.5">{{ invoice.amount }}</v-col>
-                    <v-col cols="2"></v-col>
+                    <v-col cols="2">
+                        <v-btn @click="editInvoice(invoice)" icon small ><v-icon color="red">mdi-pencil</v-icon></v-btn>
+                        <v-btn @click="deleteInvoice()" class="ml-5" icon small><v-icon color="red">mdi-delete</v-icon> </v-btn>
+                    </v-col>
                 </v-row>
             </v-card-text>
         </v-card>
@@ -23,7 +26,8 @@
             
             <v-table class=" mt-10 pt-10">
                 <v-btn @click="show=false">close</v-btn>
-            <v-btn @click="paste" >Save</v-btn>
+            <v-btn v-if="!shows" @click="paste" >Save</v-btn>
+            <v-btn  v-else @click="updateInvoice">update</v-btn>
            
                 <v-row >
                     <v-col cols="3">
@@ -86,8 +90,8 @@
                         <v-col cols="2">{{ item.price }}</v-col>
                         <v-col cols="2">{{ item.amount }}</v-col>
                         <v-col cols="2">
-                             <v-btn @click="editInvoice(item)" icon small ><v-icon color="red">mdi-delete</v-icon></v-btn>
-                             <v-btn @click="deleteInvoice(item)" class="ml-5" icon small><v-icon color="red">mdi-pencil</v-icon> </v-btn>
+                             <v-btn @click="editItem(item)" icon small ><v-icon color="red">mdi-pencil</v-icon></v-btn>
+                             <v-btn @click="deleteItem(item)" class="ml-5" icon small><v-icon color="red">mdi-delete</v-icon> </v-btn>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -148,9 +152,9 @@
                         </v-row>
                         <v-row>
                             <v-col cols="3" class="p-5">
-                                <v-btn v-if="tediting" class="mr-5" color="blue">Update</v-btn>
+                                <v-btn v-if="tediting" @click="updateItem" class="mr-5" color="blue">Update</v-btn>
                                 <v-btn v-else @click="add" class="mr-5" color="green">Save</v-btn>
-                                <v-btn color="red" class="mr-5" @click="close">Cancel</v-btn>
+                                <v-btn color="red" class="mr-5" @click="cancel()">Cancel</v-btn>
                             </v-col>
                          </v-row>
                     </v-card-text>
@@ -163,30 +167,29 @@ export default{
     data(){
         return{
             show:false,
+            shows:false,
             no:'',
             date:null,
             splex:false,
             dmenu:false,
             tediting:false,
             outside:[],
+            store:[],
             out:'',
-            customer:[
-                {sname:null}
-            ],
+            customer:null,
             product:null,
+            invoicestore:[],
             name:'',
             id:'',
             price:'',
             quantity:1,
             items: [], 
             amount:null,
-            sname:null
+            sname:null,
         }
     },
     methods:{
-        close(){
-            this.splex=false
-        },
+
         getRate(v){
             let product = this.$store.getters.loadedProduct(v)
             this.price = product.price
@@ -197,18 +200,62 @@ export default{
             let customer = this.$store.getters.loadedCustomer(v)
             this.sname = customer.name
         },
+    //Items------------------------------------------------->
+
         add(){
             this.items.push(
                 {
-                   name:this.name,
-                   id:this.id,
-                   price:this.price,
-                   quantity:this.quantity,
-                   amount:this.amountIn
+                   name: this.name,
+                   id: this.id,
+                   price: this.price,
+                   quantity: this.quantity,
+                   amount: this.amountIn,
+                   items: this.items,
+                   product: this.product
                 }
             )
-            this.close()
+            this.refresh()
         },
+        
+        close(){
+            this.no=null
+            this.date=null
+            this.sname=null
+            this.items=[]
+            this.tediting=false
+            this.customer=null
+            this.show=false
+        },
+        editItem(product){
+            this.splex=true
+            this.tediting=true
+            this.name=product.name
+            this.id=product.id
+            this.price=product.price
+            this.quantity=product.quantity
+            this.store=product
+        },
+        updateItem(){
+            let index = this.items.indexOf(this.store)
+            this.items.splice(index,1)
+            this.items.push(
+                {
+                   name: this.name,
+                   id: this.id,
+                   price: this.price,
+                   quantity: this.quantity,
+                   amount: this.amountIn,
+                }
+            )
+            this.tediting=false
+            this.refresh()
+        },
+        deleteItem(product){
+            let index=this.items.indexOf(product)
+            this.items.splice(index,1)
+        },
+    //invoice------------------------------------------------->
+
         paste(){
             this.invoices.push(
                 {
@@ -216,24 +263,54 @@ export default{
                     date:this.date,
                     name:this.sname,
                     amount:this.tamount,
-
+                    items:this.items,
+                    customer: this.customer
+                }
+            )
+            this.close()
+        },
+        editInvoice(invoice){
+            this.show=true
+            this.no=invoice.no
+            this.date=invoice.date
+            this.items = invoice.items
+            this.customer = invoice.customer
+            this.shows = true
+            this.invoicestore = invoice
+        },
+        deleteInvoice(invoice){
+            let index = this.invoices.indexOf(invoice)
+            this.invoices.splice(index,1)
+        },
+        updateInvoice(){
+            let index = this.items.indexOf(this.invoicestore)
+            this.items.splice(index,1)
+            this.items.push(
+                {
+                    no:this.no,
+                    date:this.date,
+                    name:this.sname,
+                    amount:this.tamount,
+                    
                 }
             )
             this.show=false
             this.close()
+            this.shows=false
         },
-        editInvoice(product){
-            this.splex=true
-            this.name=product.name
-            this.id=product.id
-            this.price=product.price
-            this.quantity=product.quantity
-            this.store=product
+        refresh(){
+            this.splex=false
+            this.name=null
+            this.id=null
+            this.price=null
+            this.amount=null
+            this.quantity=1
+            
         },
-        deleteInvoice(product){
-            let index=this.products.indexOf(product)
-            this.products.splice(index,1)
-        },
+        cancel(){
+            this.splex=false
+        }
+
         // totamount(){
         //     let tamount = 0
         //     for(let i in items)

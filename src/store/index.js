@@ -20,7 +20,7 @@ export default createStore({
     loadedCustomer(state){
       return (customerId)=>{
         return state.customers.find((customer)=>{
-          return customer.id = customerId
+          return customer.iid = customerId
         })
       }
     },
