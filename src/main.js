@@ -10,6 +10,7 @@ firebase.auth().onAuthStateChanged((user)=>{
   if(user){
       store.dispatch('customerdetails')
       store.dispatch('productDetails')
+      store.dispatch('invoicedetails')
   }
 })
 

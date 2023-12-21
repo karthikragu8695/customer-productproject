@@ -1,6 +1,7 @@
 <template>
     <v-container>
-                <v-table>
+        <v-btn @click="show=true" color="blue">Add Customers</v-btn>
+                <v-table class="mt-5">
                     <thead>
                     <tr>
                         <th>Customer Id</th>
@@ -13,12 +14,13 @@
                         <td>{{ customer.id }}</td>
                         <td>{{ customer.name }}</td>
                         <td>{{ customer.phone }}</td>
-                        <td ><v-btn @click="editcu(customer)">edit</v-btn></td>
-                        <td ><v-btn @click="deleteLi(customer)">delete</v-btn></td>
+                        <td >
+                            <v-btn @click="editcu(customer)"  min-height="3" min-width="1" rounded><v-icon color="orange">mdi-pencil</v-icon></v-btn>
+                            <v-btn @click="deleteLi(customer)" class="mx-3" min-height="3" min-width="1" rounded><v-icon color="red">mdi-delete</v-icon></v-btn></td>
                     </tr>
                     </thead>
                 </v-table>
-                <v-btn @click="show=true">Add</v-btn>
+                
             <v-dialog v-model="show">
                 <v-card
                         

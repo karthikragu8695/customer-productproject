@@ -5,7 +5,7 @@ export default createStore({
   state: {
     customers:[],
     products:[],
-    Invoice:[]
+    invoices:[],
   },
   getters: {
     customerDetails(state){
@@ -14,8 +14,8 @@ export default createStore({
     productDetails(state){
       return state.products
     },
-    loadedInvoices(state){
-      return state.Invoice
+    InvoiceDetails(state){
+      return state.invoices
     },
     loadedCustomer(state){
       return (customerId)=>{
@@ -31,7 +31,7 @@ export default createStore({
           })
       }
   },
-    invoiceDetails(state){
+    loadedInvoice(state){
       return (invoiceId)=>{
         return state.invoices.find((invoice) => {
           return invoice.iid === invoiceId
@@ -46,8 +46,8 @@ export default createStore({
     PRODUCT_DETAILS(state,payload){
       state.products=payload
     },INVOICE_DETAILS(state,payload){
-      state.Invoice=payload
-    }
+      state.invoices=payload
+    },
   },
   actions: {
     customerdetails({commit}){
@@ -89,10 +89,9 @@ export default createStore({
             ...data[i]
           })
         }
+        console.log(invoices)
         commit('INVOICE_DETAILS',invoices)
       })
     }
   },
-  modules: {
-  }
 })

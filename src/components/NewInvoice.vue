@@ -1,9 +1,9 @@
 <template>
     <v-container>
-        <v-btn @click="show=true" color="blue">New Invoice</v-btn>
-        <v-card>
+        <v-btn v-model="show" @click="open" color="blue">New Invoice</v-btn>
+        <v-card class="mt-10">
             <v-card-text>
-                <v-row>
+                <v-row >
                     <v-col cols="2">Invoice No</v-col>
                     <v-col cols="2.5">Invoice Date</v-col>
                     <v-col cols="3">Customer Name</v-col>
@@ -16,19 +16,26 @@
                     <v-col cols="3">{{ invoice.name }}</v-col>
                     <v-col cols="2.5">{{ invoice.amount }}</v-col>
                     <v-col cols="2">
-                        <v-btn @click="editInvoice(invoice)" icon small ><v-icon color="red">mdi-pencil</v-icon></v-btn>
-                        <v-btn @click="deleteInvoice()" class="ml-5" icon small><v-icon color="red">mdi-delete</v-icon> </v-btn>
+                        <v-btn @click="editInvoice(invoice)" min-height="3" min-width="1" rounded><v-icon color="orange">mdi-pencil</v-icon></v-btn>
+                        <v-btn @click="deleteInvoice()" class="ml-5" min-height="3" min-width="1" rounded><v-icon color="red">mdi-delete</v-icon></v-btn>
                     </v-col>
                 </v-row>
             </v-card-text>
         </v-card>
         <v-dialog v-model="show" fullscreen  hide-overlay class="pt-10 ">
             
-            <v-table class=" mt-10 pt-10">
-                <v-btn @click="show=false">close</v-btn>
-            <v-btn v-if="!shows" @click="paste" >Save</v-btn>
-            <v-btn  v-else @click="updateInvoice">update</v-btn>
-           
+            <v-table>
+                <v-row  class="mt-2">
+                    <v-col cols="3">
+                        <v-btn v-model="show" @click="close" color="red" ><v-icon class="red--text">mdi-close</v-icon></v-btn>
+                    </v-col>
+                     <v-spacer></v-spacer>
+                     <v-col cols="1">
+                        <v-btn v-if="!shows" @click="paste" color="green" >Save</v-btn>
+                        <v-btn  v-else @click="updateInvoice" color="blue">update</v-btn>
+                    </v-col>
+                </v-row><br>
+                <hr>
                 <v-row >
                     <v-col cols="3">
                         <v-text-field
@@ -90,8 +97,8 @@
                         <v-col cols="2">{{ item.price }}</v-col>
                         <v-col cols="2">{{ item.amount }}</v-col>
                         <v-col cols="2">
-                             <v-btn @click="editItem(item)" icon small ><v-icon color="red">mdi-pencil</v-icon></v-btn>
-                             <v-btn @click="deleteItem(item)" class="ml-5" icon small><v-icon color="red">mdi-delete</v-icon> </v-btn>
+                             <v-btn @click="editItem(item)" min-height="3" min-width="1" rounded><v-icon color="orange">mdi-pencil</v-icon></v-btn>
+                             <v-btn @click="deleteItem(item)" class="ml-5" min-height="3" min-width="1" rounded><v-icon color="red">mdi-delete</v-icon></v-btn>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -163,6 +170,7 @@
     </v-container>
 </template>
 <script>
+import {firebase} from '../firebase'
 export default{
     data(){
         return{
@@ -210,13 +218,19 @@ export default{
                    price: this.price,
                    quantity: this.quantity,
                    amount: this.amountIn,
-                   items: this.items,
-                   product: this.product
+                   product: this.product,
                 }
             )
             this.refresh()
         },
-        
+        open(){
+            this.no=null
+            this.date=null
+            this.sname=null
+            this.items=[]
+            this.tediting=false
+            this.show=true
+        },
         close(){
             this.no=null
             this.date=null
@@ -224,6 +238,7 @@ export default{
             this.items=[]
             this.tediting=false
             this.customer=null
+            this.product=null
             this.show=false
         },
         editItem(product){
@@ -254,19 +269,35 @@ export default{
             let index=this.items.indexOf(product)
             this.items.splice(index,1)
         },
+        cancel(){
+            this.splex=false
+            this.refresh()
+        },
     //invoice------------------------------------------------->
 
         paste(){
-            this.invoices.push(
-                {
-                    no:this.no,
-                    date:this.date,
-                    name:this.sname,
-                    amount:this.tamount,
-                    items:this.items,
-                    customer: this.customer
-                }
-            )
+            // this.invoices.push(
+            //     {
+            //         no:this.no,
+            //         date:this.date,
+            //         name:this.sname,
+            //         amount:this.tamount,
+            //         items:this.items,
+            //         customer: this.customer
+            //     }
+            // )
+            // this.close()
+            const invoice={
+                     no:this.no,
+                     date:this.date,
+                     name:this.sname,
+                     amount:this.tamount,
+                     items:this.items,
+                     customer: this.customer
+                     
+            }
+            console.log(invoice)
+            firebase.database().ref('invoices').push(invoice)
             this.close()
         },
         editInvoice(invoice){
@@ -279,24 +310,39 @@ export default{
             this.invoicestore = invoice
         },
         deleteInvoice(invoice){
-            let index = this.invoices.indexOf(invoice)
-            this.invoices.splice(index,1)
+            // let index = this.invoices.indexOf(invoice)
+            // this.invoices.splice(index,1)
+            firebase.database().ref(`invoices/${invoice.iid}`).remove()
+            .then(()=>{
+                console.log('invoice deleted')
+            })
         },
         updateInvoice(){
-            let index = this.items.indexOf(this.invoicestore)
-            this.items.splice(index,1)
-            this.items.push(
+            let index = this.invoices.indexOf(this.invoicestore)
+            this.invoices.splice(index,1)
+            this.invoices.push(
                 {
                     no:this.no,
                     date:this.date,
                     name:this.sname,
                     amount:this.tamount,
-                    
+                    items:this.items,
+                    store:this.store,
+                    product:this.product,
+                    customer: this.customer,
+                   
                 }
             )
             this.show=false
             this.close()
             this.shows=false
+            // let invoice = {
+            //         no:this.no,
+            //         date:this.date,
+            //         name:this.sname,
+            //         amount:this.tamount,
+            // }
+            // firebase.database().ref('invoices/'+this.invoicestore.iid)
         },
         refresh(){
             this.splex=false
@@ -307,10 +353,6 @@ export default{
             this.quantity=1
             
         },
-        cancel(){
-            this.splex=false
-        }
-
         // totamount(){
         //     let tamount = 0
         //     for(let i in items)
@@ -344,8 +386,8 @@ export default{
         return amount
       },
       invoices(){
-        return this.$store.getters.loadedInvoices
-      }
+        return this.$store.getters.InvoiceDetails
+      },
     }
 }
 </script>

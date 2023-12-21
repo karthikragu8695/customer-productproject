@@ -1,24 +1,25 @@
 <template>
     <v-container>
-                <v-table>
+        <v-btn @click="show=true" color="blue">Add Products</v-btn>
+                <v-table class="mt-5">
                     <thead>
                     <tr>
                         <th>product Id</th>
                         <th>product Name</th>
                         <th>product Price</th>
-                        <th></th>
+                        <th>Action</th>
                         <th></th>
                     </tr>
                     <tr v-for="product in products" :key="product.id">
                         <td>{{ product.id }}</td>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
-                        <td ><v-btn @click="editcu(product)">edit</v-btn></td>
-                        <td ><v-btn @click="deleteLi(product)">delete</v-btn></td>
+                        <td ><v-btn @click="editcu(product)" min-height="3" min-width="1" rounded><v-icon color="orange">mdi-pencil</v-icon></v-btn>
+                        <v-btn @click="deleteLi(product)" class="mx-3" min-height="3" min-width="1" rounded><v-icon color="red">mdi-delete</v-icon></v-btn></td>
                     </tr>
                     </thead>
                 </v-table>
-                <v-btn @click="show=true">Add</v-btn>
+               
             <v-dialog v-model="show">
                 <v-card
                         
@@ -58,8 +59,7 @@
         Complete Registration
         <v-icon icon="mdi-chevron-right" end></v-icon>
         </v-btn>
-      <v-btn v-else color="success" @click="updatecu">
-        update
+      <v-btn v-else color="success" @click="updatecu">update
         <v-icon icon="mdi-chevron-right" end></v-icon>
       </v-btn>
     </v-card-actions>
